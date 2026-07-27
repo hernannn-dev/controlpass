@@ -1,286 +1,601 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SENA - Sistema Industrial de Control de Equipos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@400;600;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>SENA - Sistema Integral de Control de Equipos</title>
+    
+    <!-- Fuentes Modernas -->
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Iconos FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Librerías para QR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
     <style>
+        /* ================= VARIABLES DE TEMA ================= */
         :root {
-            --sena-green: #39A900;
-            --sena-green-glow: rgba(57, 169, 0, 0.4);
-            --industrial-dark: #121418;
-            --industrial-panel: #1e2229;
-            --industrial-border: #2d333b;
-            --text-main: #e2e8f0;
+            /* Modo Claro (Por defecto si se cambia) */
+            --sena-primary: #39A900;
+            --sena-hover: #2b7d00;
+            --bg-body: #f1f5f9;
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            
+            --alert-red: #ef4444;
+            --alert-red-bg: #fef2f2;
+            --alert-orange: #f59e0b;
+            --alert-orange-bg: #fffbeb;
+            --alert-blue: #3b82f6;
+            --alert-blue-bg: #eff6ff;
+            --alert-green-bg: #f0fdf4;
+        }
+
+        [data-theme="dark"] {
+            /* Modo Oscuro (Predeterminado inicial) */
+            --bg-body: #0f172a;
+            --surface: #1e293b;
+            --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --alert-red: #ff3b3b;
-            --alert-orange: #ff9800;
-            --alert-blue: #00a8ff;
+            --border-color: #334155;
+            --input-bg: #0f172a;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+            
+            --alert-red-bg: rgba(239, 68, 68, 0.1);
+            --alert-orange-bg: rgba(245, 158, 11, 0.1);
+            --alert-blue-bg: rgba(59, 130, 246, 0.1);
+            --alert-green-bg: rgba(57, 169, 0, 0.1);
         }
 
+        /* ================= ESTILOS GLOBALES ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; }
+        
         body, html {
-            font-family: 'Roboto', sans-serif; background-color: var(--industrial-dark);
-            color: var(--text-main); margin: 0; padding: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(18, 20, 24, 0.95), rgba(18, 20, 24, 0.95)),
-                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.01) 10px, rgba(255,255,255,0.01) 20px);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
         }
 
-        h1, h2, h3, h4 { font-family: 'Jura', sans-serif; color: var(--sena-green); text-transform: uppercase; margin-top: 0; }
-        .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
+        h1, h2, h3, h4 { font-family: 'Jura', sans-serif; color: var(--sena-primary); text-transform: uppercase; font-weight: 700; }
+        
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px; }
 
+        /* HEADER & NAVBAR */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--surface);
+            padding: 15px 30px;
+            box-shadow: var(--shadow);
+            border-bottom: 2px solid var(--sena-primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar-brand { display: flex; align-items: center; gap: 15px; }
+        .navbar-brand img { width: 40px; }
+        .navbar-brand h2 { margin: 0; font-size: 1.5rem; letter-spacing: 1px; }
+
+        .navbar-controls { display: flex; align-items: center; gap: 15px; }
+        
+        .btn-icon {
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            color: var(--text-main); width: 40px; height: 40px; border-radius: 50%;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            font-size: 1.2rem; transition: all 0.2s;
+        }
+        .btn-icon:hover { border-color: var(--sena-primary); color: var(--sena-primary); }
+
+        .btn-logout {
+            background: transparent; border: 1px solid var(--alert-red);
+            color: var(--alert-red); padding: 8px 15px; border-radius: 6px;
+            font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-logout:hover { background: var(--alert-red); color: #fff; }
+
+        /* CARJETAS (Cards) */
         .card {
-            background: var(--industrial-panel); padding: 25px; border-radius: 6px;
-            border: 1px solid var(--industrial-border); border-left: 5px solid var(--sena-green);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5); margin-bottom: 20px; position: relative;
+            background: var(--surface); border-radius: 12px;
+            border: 1px solid var(--border-color); padding: 30px;
+            box-shadow: var(--shadow); margin-bottom: 25px;
+        }
+        .card-header { margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+
+        /* FORMULARIOS */
+        .form-section-title { font-size: 1.1rem; margin: 25px 0 15px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .form-section-title i { color: var(--sena-primary); }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+
+        label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        input, select, textarea {
+            width: 100%; padding: 12px 15px; background-color: var(--input-bg);
+            border: 1px solid var(--border-color); color: var(--text-main);
+            border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 1rem;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none; border-color: var(--sena-primary);
+            box-shadow: 0 0 0 3px rgba(57, 169, 0, 0.2);
         }
 
+        input[type="file"] { padding: 8px; font-size: 0.9rem; }
+        input[type="file"]::file-selector-button {
+            background-color: var(--surface); color: var(--text-main);
+            border: 1px solid var(--border-color); padding: 8px 16px;
+            border-radius: 6px; cursor: pointer; margin-right: 15px; font-weight: 600;
+        }
+
+        /* BOTONES PRINCIPALES */
+        .btn-primary {
+            background-color: var(--sena-primary); color: #fff; border: none;
+            padding: 14px 24px; border-radius: 8px; cursor: pointer;
+            font-size: 1rem; font-weight: 700; font-family: 'Jura', sans-serif;
+            text-transform: uppercase; letter-spacing: 1px; width: 100%;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            transition: background 0.3s, transform 0.1s;
+        }
+        .btn-primary:hover { background-color: var(--sena-hover); }
+        .btn-primary:active { transform: scale(0.98); }
+
+        .btn-success { background-color: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-danger-solid { background-color: var(--alert-red); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+
+        /* ALERTAS */
+        .alert {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            font-weight: 600; display: flex; align-items: center; gap: 12px;
+            font-size: 0.95rem; border-left: 4px solid;
+        }
+        .alert-error { background-color: var(--alert-red-bg); color: var(--alert-red); border-color: var(--alert-red); }
+        .alert-success { background-color: var(--alert-green-bg); color: var(--sena-primary); border-color: var(--sena-primary); }
+        .alert-warning { background-color: var(--alert-orange-bg); color: var(--alert-orange); border-color: var(--alert-orange); }
+        .alert-info { background-color: var(--alert-blue-bg); color: var(--alert-blue); border-color: var(--alert-blue); }
+
+        /* TABS PARA ADMIN */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; overflow-x: auto;}
+        .tab-btn {
+            background: transparent; color: var(--text-muted); border: none;
+            padding: 10px 20px; font-weight: 600; font-family: 'Jura', sans-serif;
+            font-size: 1.1rem; cursor: pointer; border-radius: 6px; transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { background: var(--input-bg); }
+        .tab-btn.active { background: var(--alert-green-bg); color: var(--sena-primary); }
+
+        /* TABLAS */
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 15px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        th { background-color: var(--input-bg); color: var(--text-muted); font-family: 'Jura', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; }
+        tbody tr:hover { background-color: var(--input-bg); }
+
+        /* UTILIDADES E IMAGENES */
         .hidden { display: none !important; }
-
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-group { margin-bottom: 12px; }
-        .form-group.full-width { grid-column: span 2; }
+        .img-thumb { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); }
+        .img-avatar { border-radius: 50%; }
         
-        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .status-in { background: var(--alert-green-bg); color: var(--sena-primary); border: 1px solid var(--sena-primary); }
+        .status-out { background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border-color); }
 
-        input, select {
-            width: 100%; padding: 14px; background-color: #0b0d10; border: 1px solid var(--industrial-border);
-            color: var(--text-main); border-radius: 4px; font-family: 'Roboto', sans-serif; font-size: 16px;
-            box-sizing: border-box; transition: all 0.3s ease;
+        /* LECTOR QR */
+        #reader-container { width: 100%; max-width: 500px; margin: 0 auto; overflow: hidden; border-radius: 12px; border: 2px solid var(--sena-primary); background: #000; }
+        #reader { width: 100%; border: none; }
+        .direction-controls { display: flex; gap: 15px; margin-bottom: 20px; justify-content: center;}
+        .dir-btn {
+            flex: 1; max-width: 200px; padding: 15px; font-size: 1rem; font-weight: 700;
+            background: var(--input-bg); border: 2px solid var(--border-color);
+            color: var(--text-muted); border-radius: 8px; cursor: pointer; transition: all 0.3s;
         }
-        input:focus, select:focus { outline: none; border-color: var(--sena-green); box-shadow: 0 0 10px var(--sena-green-glow); }
+        .dir-btn.active-in { background: var(--alert-green-bg); border-color: var(--sena-primary); color: var(--sena-primary); }
+        .dir-btn.active-out { background: var(--alert-orange-bg); border-color: var(--alert-orange); color: var(--alert-orange); }
 
-        button {
-            background-color: var(--sena-green); color: #000; border: none; padding: 16px 20px;
-            border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; text-transform: uppercase;
-            width: 100%; font-family: 'Jura', sans-serif; transition: all 0.2s ease;
+        /* MODALES */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
-        button:active { transform: scale(0.98); }
-
-        .btn-danger { background-color: transparent; border: 1px solid var(--alert-red); color: var(--alert-red); padding: 10px; width: auto; font-size: 14px; }
-        .btn-danger:active { background-color: var(--alert-red); color: #fff; }
-
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--industrial-border); }
-        th { background-color: #16191f; color: var(--sena-green); font-family: 'Jura', sans-serif; }
+        .modal-content {
+            background: var(--surface); padding: 30px; border-radius: 12px;
+            width: 90%; max-width: 500px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color); position: relative;
+        }
         
-        .alert { padding: 15px; margin-bottom: 15px; border-radius: 4px; font-weight: bold; text-align: center; border-left: 4px solid; text-transform: uppercase; font-family: 'Jura'; font-size: 1.1rem;}
-        .alert-error { background-color: rgba(255, 59, 59, 0.1); color: #ff6b6b; border-color: var(--alert-red); }
-        .alert-success { background-color: rgba(57, 169, 0, 0.1); color: var(--sena-green); border-color: var(--sena-green); }
-        .alert-warning { background-color: rgba(255, 152, 0, 0.1); color: var(--alert-orange); border-color: var(--alert-orange); }
-        .alert-info { background-color: rgba(0, 168, 255, 0.1); color: var(--alert-blue); border-color: var(--alert-blue); }
-
-        .nav-bar { display: flex; justify-content: space-between; align-items: center; background-color: var(--industrial-panel); padding: 15px; border-bottom: 1px solid var(--sena-green); }
-        .nav-bar h2 { margin: 0; font-size: 1.2rem; }
-
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .form-group.full-width { grid-column: span 1; }
-            .nav-bar { flex-direction: column; gap: 10px; text-align: center; }
-            .tabs { display: flex; width: 100%; }
-            .tab-btn { flex: 1; padding: 12px 5px; font-size: 12px; }
-        }
-
-        /* Tabs */
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
-        .tab-btn { background-color: transparent; color: var(--text-muted); border: 1px solid var(--industrial-border); box-shadow: none; border-radius: 4px; }
-        .tab-btn.active { background-color: rgba(57, 169, 0, 0.1); color: var(--sena-green); border-color: var(--sena-green); }
-
-        /* Lector QR Mobile */
-        #reader-container { width: 100%; max-width: 500px; margin: 0 auto; overflow: hidden; border-radius: 8px; border: 2px solid var(--sena-green); background: #000; position: relative;}
-        #reader { width: 100%; }
+        .qr-wrapper { background: white; padding: 20px; border-radius: 8px; display: inline-block; margin: 20px 0; }
         
-        /* Controles de Dirección (Botones grandes móviles) */
-        .direction-controls { display: flex; gap: 10px; margin-bottom: 15px; }
-        .dir-btn { flex: 1; padding: 20px; font-size: 1.2rem; background: var(--industrial-dark); border: 2px solid var(--industrial-border); color: var(--text-muted); }
-        .dir-btn.active-in { background: rgba(57, 169, 0, 0.2); border-color: var(--sena-green); color: var(--sena-green); }
-        .dir-btn.active-out { background: rgba(255, 152, 0, 0.2); border-color: var(--alert-orange); color: var(--alert-orange); }
+        .verify-grid { display: grid; grid-template-columns: 80px 1fr; gap: 15px; margin-bottom: 20px; text-align: left; background: var(--input-bg); padding: 15px; border-radius: 8px;}
+        .verify-img { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; }
+        
+        /* DASHBOARD ADMIN CARDS */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: var(--surface); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); border-left: 5px solid var(--sena-primary); display: flex; flex-direction: column; }
+        .stat-card span { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+        .stat-card strong { font-size: 2rem; color: var(--text-main); font-family: 'Jura'; margin-top: 5px; }
 
-        /* Modal QR */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: var(--industrial-panel); padding: 30px; border-radius: 8px; text-align: center; border: 2px solid var(--sena-green); max-width: 90%; }
-        #qrCodeCanvas { background: white; padding: 15px; border-radius: 4px; display: inline-block; margin: 20px 0; }
     </style>
 </head>
 <body>
 
-    <!-- 1. LOGIN -->
-    <div id="loginView" class="container">
-        <div class="card" style="max-width: 400px; margin: 5vh auto; text-align: center;">
-            <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="var(--sena-green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px;">
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--sena-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
             </svg>
-            <h2>Control Activos</h2>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">
-                Aprendiz: aprendiz / 123 <br> Vigilancia: admin / 123
-            </p>
-            <div id="loginAlert" class="alert hidden"></div>
-            
-            <form id="loginForm" style="text-align: left;">
-                <div class="form-group">
-                    <input type="text" id="username" placeholder="Usuario" required autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <input type="password" id="password" placeholder="Contraseña" required>
-                </div>
-                <button type="submit" style="margin-top: 10px;">ACCEDER</button>
-            </form>
+            <h2>SENA Control</h2>
         </div>
-    </div>
+        <div class="navbar-controls">
+            <button class="btn-icon" onclick="toggleTheme()" title="Cambiar Tema">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+            <button class="btn-logout hidden" id="btnLogout" onclick="cerrarSesion()">
+                <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
+        </div>
+    </nav>
 
-    <!-- 2. PORTAL APRENDIZ -->
-    <div id="userView" class="hidden">
-        <div class="nav-bar">
-            <h2>REGISTRO DE EQUIPOS</h2>
-            <button class="btn-danger" onclick="cerrarSesion()">SALIR</button>
-        </div>
+    <div class="container">
         
-        <div class="container">
-            <div class="card">
-                <div id="userAlert" class="alert hidden"></div>
-                <form id="registroEquipoForm">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Propietario (Nombre Completo)</label>
-                            <input type="text" id="regPropietario" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Programa de Formación</label>
-                            <select id="regPrograma" required onchange="actualizarCategorias()">
-                                <option value="">Seleccione...</option>
-                                <option value="Soldadura">Soldadura</option>
-                                <option value="Sistemas">Sistemas</option>
-                                <option value="Mecanica">Mecánica</option>
-                                <option value="Diseno">Diseño</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Categoría</label>
-                            <select id="regCategoria" required><option value="">Seleccione programa...</option></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Marca / Modelo</label>
-                            <input type="text" id="regDetalle" required>
-                        </div>
-                        <div class="form-group full-width hidden">
-                            <!-- Serial Oculto Auto-generado -->
-                            <input type="text" id="regSerial" readonly>
-                        </div>
+        <!-- 1. LOGIN VIEW -->
+        <div id="loginView">
+            <div class="card" style="max-width: 450px; margin: 5vh auto; text-align: center;">
+                <div class="card-header" style="border:none; margin-bottom: 5px;">
+                    <h2>Inicio de Sesión</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Plataforma de control de activos y personal</p>
+                </div>
+                
+                <div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; text-align: left; border-left: 4px solid var(--sena-primary);">
+                    <strong>Credenciales Demo:</strong><br>
+                    <i class="fas fa-user-graduate"></i> Aprendiz: <code>aprendiz</code> / <code>123</code><br>
+                    <i class="fas fa-shield-alt"></i> Vigilancia: <code>admin</code> / <code>123</code>
+                </div>
+
+                <div id="loginAlert" class="alert hidden"></div>
+                
+                <form id="loginForm" style="text-align: left;">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label><i class="fas fa-user"></i> Usuario</label>
+                        <input type="text" id="username" placeholder="Ingrese su usuario" required autocomplete="off">
                     </div>
-                    <button type="submit" style="margin-top: 20px;">GENERAR IDENTIFICADOR QR</button>
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label><i class="fas fa-lock"></i> Contraseña</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        Acceder <i class="fas fa-arrow-right"></i>
+                    </button>
                 </form>
             </div>
         </div>
-    </div>
 
-    <!-- MODAL QR APRENDIZ -->
-    <div id="modalQR" class="modal hidden">
-        <div class="modal-content">
-            <h3 style="margin-bottom: 5px;">EQUIPO REGISTRADO</h3>
-            <p style="color: var(--text-muted); font-size: 14px; margin: 0;">Guarde este QR para presentarlo en portería.</p>
-            <div id="qrCodeCanvas"></div>
-            <h4 id="qrSerialDisplay" style="color: #fff; letter-spacing: 2px;"></h4>
-            <button onclick="cerrarModalQR()">ENTENDIDO / CERRAR</button>
+        <!-- 2. PORTAL APRENDIZ (Registro de equipos) -->
+        <div id="userView" class="hidden">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-laptop-medical"></i> Registro de Equipo Personal</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Complete todos los datos. El vigilante verificará físicamente el serial de su equipo.</p>
+                </div>
+
+                <div id="userAlert" class="alert hidden"></div>
+                
+                <form id="registroEquipoForm">
+                    <!-- Sección Persona -->
+                    <h3 class="form-section-title"><i class="fas fa-id-card"></i> Datos del Propietario</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tipo de Documento</label>
+                            <select id="regTipoDoc" required>
+                                <option value="CC">Cédula de Ciudadanía (CC)</option>
+                                <option value="TI">Tarjeta de Identidad (TI)</option>
+                                <option value="CE">Cédula de Extranjería (CE)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Número de Documento</label>
+                            <input type="number" id="regDocumento" required placeholder="Ej: 1002345678">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Nombre Completo</label>
+                            <input type="text" id="regPropietario" required placeholder="Nombres y Apellidos">
+                        </div>
+                        <div class="form-group">
+                            <label>Centro de Formación / Regional</label>
+                            <select id="regCentro" required>
+                                <option value="CIMI - Santander">CIMI - Santander (Girón)</option>
+                                <option value="CSET - Santander">CSET - Santander (Bucaramanga)</option>
+                                <option value="CASAA - Santander">CASAA - Santander (Piedecuesta)</option>
+                                <option value="Barrancabermeja">CBA - Barrancabermeja</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>No. Ficha de Formación</label>
+                            <input type="number" id="regFicha" required placeholder="Ej: 2550123">
+                        </div>
+                    </div>
+
+                    <!-- Sección Equipo -->
+                    <h3 class="form-section-title"><i class="fas fa-desktop"></i> Especificaciones del Equipo</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tipo de Equipo</label>
+                            <select id="regCategoria" required>
+                                <option value="Laptop/Portátil">Laptop / Portátil</option>
+                                <option value="Herramienta Especializada">Herramienta Especializada</option>
+                                <option value="Cámara Fotográfica/Video">Cámara Fotográfica / Video</option>
+                                <option value="Instrumento Musical">Instrumento Musical</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Marca y Modelo</label>
+                            <input type="text" id="regMarca" required placeholder="Ej: HP Pavilion 15">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Serial Físico del Fabricante (S/N) <span style="color:var(--alert-red);">*Vital para ingreso</span></label>
+                            <input type="text" id="regSerialFisico" required placeholder="Revisar etiqueta debajo del equipo. Ej: 5CD12345X">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Estado Físico / Novedades al Ingreso</label>
+                            <textarea id="regEstadoFisico" rows="2" placeholder="Ej: Pantalla rayada en esquina superior, falta tecla Enter. Si está perfecto, escribir 'Buen estado'." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de Terminación (Vigencia)</label>
+                            <input type="date" id="regFechaFin" required>
+                        </div>
+                    </div>
+
+                    <!-- Sección Fotos -->
+                    <h3 class="form-section-title"><i class="fas fa-camera"></i> Evidencia Fotográfica</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Foto de su Rostro (Identificación)</label>
+                            <input type="file" id="regFotoPersona" accept="image/*" capture="user" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Foto del Equipo (Con el serial visible si es posible)</label>
+                            <input type="file" id="regFotoEquipo" accept="image/*" capture="environment" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="margin-top: 30px;">
+                        <i class="fas fa-qrcode"></i> Registrar y Generar Pase QR
+                    </button>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <!-- 3. TERMINAL VIGILANCIA (Móvil) -->
-    <div id="adminView" class="hidden">
-        <div class="nav-bar">
-            <h2>MÓDULO PORTERÍA</h2>
-            <button class="btn-danger" onclick="cerrarSesion()">SALIR</button>
-        </div>
-
-        <div class="container" style="padding-top: 0;">
-            <div class="tabs">
-                <button class="tab-btn active" id="tabScanner" onclick="cambiarTabAdmin('scanner')">ESCANEAR</button>
-                <button class="tab-btn" id="tabBD" onclick="cambiarTabAdmin('bd')">INVENTARIO</button>
-                <button class="tab-btn" id="tabHistorial" onclick="cambiarTabAdmin('historial')">HISTORIAL</button>
+        <!-- 3. PORTAL VIGILANCIA / ADMIN -->
+        <div id="adminView" class="hidden">
+            
+            <!-- Dashboard Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span>Equipos Registrados (BD)</span>
+                    <strong id="statTotal">0</strong>
+                </div>
+                <div class="stat-card" style="border-left-color: #10b981;">
+                    <span>Actualmente en Planta</span>
+                    <strong id="statDentro">0</strong>
+                </div>
             </div>
 
-            <!-- ESCÁNER -->
-            <div id="secScanner" class="card" style="padding: 15px; text-align: center;">
-                <div class="direction-controls">
-                    <button id="btnIngreso" class="dir-btn active-in" onclick="setDireccion('INGRESO')">ENTRADA</button>
-                    <button id="btnSalida" class="dir-btn" onclick="setDireccion('SALIDA')">SALIDA</button>
+            <div class="tabs">
+                <button class="tab-btn active" id="tabScanner" onclick="cambiarTabAdmin('scanner')"><i class="fas fa-expand"></i> Escáner Portería</button>
+                <button class="tab-btn" id="tabBD" onclick="cambiarTabAdmin('bd')"><i class="fas fa-database"></i> Inventario & Registros</button>
+                <button class="tab-btn" id="tabHistorial" onclick="cambiarTabAdmin('historial')"><i class="fas fa-list"></i> Bitácora de Movimientos</button>
+            </div>
+
+            <!-- TAB: ESCÁNER -->
+            <div id="secScanner" class="card">
+                <div class="card-header" style="text-align: center;">
+                    <h2>Módulo de Portería</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Seleccione el sentido del flujo y apunte la cámara al QR del aprendiz.</p>
                 </div>
                 
-                <div id="scannerAlert" class="alert alert-info">CÁMARA LISTA - APUNTE AL QR</div>
+                <div class="direction-controls">
+                    <button id="btnIngreso" class="dir-btn active-in" onclick="setDireccion('INGRESO')">
+                        <i class="fas fa-sign-in-alt"></i> REGISTRAR ENTRADA
+                    </button>
+                    <button id="btnSalida" class="dir-btn" onclick="setDireccion('SALIDA')">
+                        <i class="fas fa-sign-out-alt"></i> REGISTRAR SALIDA
+                    </button>
+                </div>
+                
+                <div id="scannerAlert" class="alert alert-info">
+                    <i class="fas fa-camera"></i> CÁMARA LISTA - APUNTE AL QR
+                </div>
                 
                 <div id="reader-container">
                     <div id="reader"></div>
                 </div>
 
-                <div style="margin-top: 15px;">
-                    <label>Búsqueda Manual (Si falla cámara)</label>
-                    <input type="text" id="manualSerial" placeholder="Ej. SENA-A1B2C3" style="text-align: center; margin-bottom: 10px;">
-                    <button onclick="procesarTransaccionManual()" style="background: var(--industrial-panel); border: 1px solid var(--sena-green); color: var(--sena-green);">VERIFICAR MANUAL</button>
+                <div style="margin-top: 20px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <label>Búsqueda Manual (Si falla cámara o daño en QR)</label>
+                    <div style="display: flex; gap: 10px; max-width: 400px; margin: 10px auto 0;">
+                        <input type="text" id="manualSearch" placeholder="Cédula o Serial Físico" style="text-align: center;">
+                        <button class="btn-primary" style="width: auto;" onclick="procesarTransaccionManual()">Buscar</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- BD -->
-            <div id="secBD" class="card hidden" style="padding: 10px;">
-                <div style="overflow-x:auto;">
+            <!-- TAB: INVENTARIO BD -->
+            <div id="secBD" class="card hidden">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <h2>Inventario del Sistema</h2>
+                    <button class="btn-logout" onclick="purgarCaducados()">
+                        <i class="fas fa-trash-alt"></i> Purgar Vencidos
+                    </button>
+                </div>
+                <div id="bdAlert" class="alert hidden"></div>
+                <div class="table-container">
                     <table id="tablaBD">
-                        <thead><tr><th>Serial</th><th>Datos</th><th>Estado</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Propietario</th>
+                                <th>Datos del Equipo</th>
+                                <th>Novedades (Físico)</th>
+                                <th>Estado Actual</th>
+                            </tr>
+                        </thead>
                         <tbody></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- HISTORIAL -->
-            <div id="secHistorial" class="card hidden" style="padding: 10px;">
-                <div style="overflow-x:auto;">
+            <!-- TAB: HISTORIAL -->
+            <div id="secHistorial" class="card hidden">
+                <div class="card-header">
+                    <h2>Bitácora de Movimientos</h2>
+                </div>
+                <div class="table-container">
                     <table id="tablaHistorial">
-                        <thead><tr><th>Hora</th><th>Movimiento</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Fecha/Hora</th>
+                                <th>Movimiento</th>
+                                <th>Aprendiz</th>
+                                <th>Equipo / Serial</th>
+                            </tr>
+                        </thead>
                         <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
+
+    </div> <!-- Fin Container -->
+
+    <!-- ================= MODALES ================= -->
+
+    <!-- Modal QR Aprendiz -->
+    <div id="modalQR" class="modal-overlay hidden">
+        <div class="modal-content" style="text-align: center;">
+            <h2 style="color: var(--sena-primary); margin-bottom: 10px;">¡Registro Exitoso!</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Tome captura de pantalla de este código. Lo necesitará para entrar y salir del Centro de Formación.</p>
+            
+            <div class="qr-wrapper">
+                <div id="qrCodeCanvas"></div>
+            </div>
+            
+            <div style="background: var(--input-bg); padding: 10px; border-radius: 6px; margin-bottom: 20px;">
+                <strong>Documento:</strong> <span id="displayDoc"></span><br>
+                <strong>Serial:</strong> <span id="displaySerial"></span>
+            </div>
+            
+            <button class="btn-primary" onclick="cerrarModalQR()">Finalizar</button>
+        </div>
     </div>
 
+    <!-- Modal Verificación Guardia -->
+    <div id="modalVerify" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 style="color: var(--sena-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;">
+                <i class="fas fa-shield-check"></i> Verificación Física
+            </h2>
+            
+            <div id="verifyAlert" class="alert hidden"></div>
+
+            <div class="verify-grid">
+                <img id="vFotoPersona" src="" class="verify-img">
+                <div>
+                    <h3 id="vNombre" style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 5px;"></h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin:0;"><span id="vDoc"></span></p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin:0;">Ficha: <span id="vFicha"></span></p>
+                </div>
+            </div>
+
+            <div class="verify-grid">
+                <img id="vFotoEquipo" src="" class="verify-img">
+                <div>
+                    <h3 id="vMarca" style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 5px;"></h3>
+                    <p style="font-size: 0.9rem; color: var(--alert-blue); font-weight: bold; margin:0;">S/N Físico: <span id="vSerial"></span></p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top:5px;"><strong>Estado:</strong> <span id="vEstadoFisico"></span></p>
+                </div>
+            </div>
+
+            <p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+                Por favor, exija al aprendiz que le muestre el serial de fábrica del equipo.
+            </p>
+
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-danger-solid" style="flex:1;" onclick="cancelarVerificacion()">Rechazar</button>
+                <button class="btn-success" style="flex:2; display:flex; justify-content:center; align-items:center; gap:10px;" onclick="confirmarTransaccion()">
+                    <i class="fas fa-check-circle"></i> Autorizar <span id="vSentidoTexto"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT COMPLETADO ================= -->
     <script>
+        // --- BASE DE DATOS LOCAL ---
         const bdEquipos = {}; 
         const historialRegistros = [];
+        
         let html5QrCode = null;
         let direccionActual = 'INGRESO';
         let isProcessing = false;
+        let registroEnEspera = null; 
 
-        const categorias = {
-            "Soldadura": ["Careta", "Pulidora", "Herramienta", "Otro"],
-            "Sistemas": ["Laptop", "Tablet", "Redes", "Otro"],
-            "Mecanica": ["Caja Herramientas", "Scanner", "Multímetro", "Otro"],
-            "Diseno": ["Tableta Gráfica", "Laptop", "Cámara", "Otro"]
-        };
-
-        function actualizarCategorias() {
-            const prog = document.getElementById('regPrograma').value;
-            const sel = document.getElementById('regCategoria');
-            sel.innerHTML = '<option value="">Seleccione...</option>';
-            if (categorias[prog]) {
-                categorias[prog].forEach(cat => sel.innerHTML += `<option value="${cat}">${cat}</option>`);
+        // --- SISTEMA DE TEMA CLARO/OSCURO ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            const currentTheme = html.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                icon.className = 'fas fa-sun';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                icon.className = 'fas fa-moon';
             }
         }
 
-        function mostrarAlerta(id, msj, tipo) {
+        // --- UTILIDADES UI ---
+        function mostrarAlerta(id, msj, tipo, icono = 'info-circle') {
             const alerta = document.getElementById(id);
-            alerta.textContent = msj;
+            alerta.innerHTML = `<i class="fas fa-${icono}"></i> ${msj}`;
             alerta.className = `alert alert-${tipo}`;
             alerta.classList.remove('hidden');
         }
 
-        function ocultarAlerta(id) { document.getElementById(id).classList.add('hidden'); }
-        function obtenerFechaHora() {
-            const d = new Date();
-            return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+        function ocultarAlerta(id) { 
+            document.getElementById(id).classList.add('hidden'); 
         }
-        function generarSerialUnico() {
-            return 'SENA-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        
+        function obtenerFechaHora() {
+            return new Date().toLocaleString('es-CO');
+        }
+
+        function obtenerSoloFechaStr() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function actualizarEstadisticas() {
+            let total = 0;
+            let dentro = 0;
+            for (const doc in bdEquipos) {
+                total++;
+                if (bdEquipos[doc].estado === 'EN PLANTA') dentro++;
+            }
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statDentro').textContent = dentro;
         }
 
         function cerrarSesion() {
@@ -288,6 +603,7 @@
             document.getElementById('userView').classList.add('hidden');
             document.getElementById('adminView').classList.add('hidden');
             document.getElementById('loginView').classList.remove('hidden');
+            document.getElementById('btnLogout').classList.add('hidden');
             document.getElementById('loginForm').reset();
         }
 
@@ -300,166 +616,286 @@
             if (user === 'aprendiz' && pass === '123') {
                 document.getElementById('loginView').classList.add('hidden');
                 document.getElementById('userView').classList.remove('hidden');
-                document.getElementById('registroEquipoForm').reset();
-                document.getElementById('regSerial').value = generarSerialUnico();
-                actualizarCategorias();
+                document.getElementById('btnLogout').classList.remove('hidden');
+                document.getElementById('regFechaFin').value = obtenerSoloFechaStr();
             } else if (user === 'admin' && pass === '123') {
                 document.getElementById('loginView').classList.add('hidden');
                 document.getElementById('adminView').classList.remove('hidden');
-                cambiarTabAdmin('scanner');
+                document.getElementById('btnLogout').classList.remove('hidden');
+                actualizarEstadisticas();
+                actualizarTablaBD();
+                actualizarTablaHistorial();
+                iniciarScanner(); // Inicia la cámara automáticamente
             } else {
-                mostrarAlerta('loginAlert', 'ACCESO DENEGADO', 'error');
-                setTimeout(() => ocultarAlerta('loginAlert'), 3000);
+                mostrarAlerta('loginAlert', 'Usuario o contraseña incorrectos', 'error', 'exclamation-circle');
             }
         });
 
-        // --- REGISTRO Y GENERACIÓN DE QR ---
+        // --- APRENDIZ: REGISTRO Y QR ---
         document.getElementById('registroEquipoForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const serial = document.getElementById('regSerial').value;
             
-            bdEquipos[serial] = {
-                propietario: document.getElementById('regPropietario').value.trim(),
-                programa: document.getElementById('regPrograma').value,
+            const doc = document.getElementById('regDocumento').value.trim();
+            const serial = document.getElementById('regSerialFisico').value.trim();
+            const fotoRostro = document.getElementById('regFotoPersona').files[0];
+            const fotoEquipo = document.getElementById('regFotoEquipo').files[0];
+            
+            if(!fotoRostro || !fotoEquipo) {
+                mostrarAlerta('userAlert', 'Debe adjuntar ambas fotos', 'error');
+                return;
+            }
+
+            // Crear objeto de registro
+            const nuevoRegistro = {
+                documento: doc,
+                tipoDoc: document.getElementById('regTipoDoc').value,
+                nombre: document.getElementById('regPropietario').value,
+                centro: document.getElementById('regCentro').value,
+                ficha: document.getElementById('regFicha').value,
                 categoria: document.getElementById('regCategoria').value,
-                detalle: document.getElementById('regDetalle').value.trim(),
-                estado: 'FUERA DE INSTALACIONES'
+                marca: document.getElementById('regMarca').value,
+                serial: serial,
+                estadoFisico: document.getElementById('regEstadoFisico').value,
+                fechaFin: document.getElementById('regFechaFin').value,
+                estado: 'FUERA',
+                fotoRostroUrl: URL.createObjectURL(fotoRostro),
+                fotoEquipoUrl: URL.createObjectURL(fotoEquipo)
             };
 
-            // Generar QR
-            document.getElementById('qrCodeCanvas').innerHTML = "";
-            new QRCode(document.getElementById('qrCodeCanvas'), { text: serial, width: 220, height: 220, colorDark : "#000000", colorLight : "#ffffff" });
-            document.getElementById('qrSerialDisplay').textContent = serial;
+            // Guardar en BD Local
+            bdEquipos[doc] = nuevoRegistro;
             
+            // Generar QR 
+            document.getElementById('qrCodeCanvas').innerHTML = '';
+            new QRCode(document.getElementById('qrCodeCanvas'), {
+                text: doc,
+                width: 200,
+                height: 200,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('displayDoc').textContent = doc;
+            document.getElementById('displaySerial').textContent = serial;
+            
+            // Mostrar Modal y reiniciar
             document.getElementById('modalQR').classList.remove('hidden');
             document.getElementById('registroEquipoForm').reset();
-            document.getElementById('regSerial').value = generarSerialUnico(); 
         });
 
         function cerrarModalQR() {
             document.getElementById('modalQR').classList.add('hidden');
-            mostrarAlerta('userAlert', 'EQUIPO REGISTRADO EXITOSAMENTE', 'success');
-            setTimeout(() => ocultarAlerta('userAlert'), 4000);
         }
 
-        // --- LÓGICA VIGILANCIA (CELADOR) ---
-        function cambiarTabAdmin(tab) {
-            document.querySelectorAll('#adminView .card').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
-            if (tab === 'scanner') {
-                document.getElementById('secScanner').classList.remove('hidden');
+        // --- ADMIN: CONTROL DE TABS ---
+        function cambiarTabAdmin(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('secScanner').classList.add('hidden');
+            document.getElementById('secBD').classList.add('hidden');
+            document.getElementById('secHistorial').classList.add('hidden');
+            
+            if(tabId === 'scanner') {
                 document.getElementById('tabScanner').classList.add('active');
+                document.getElementById('secScanner').classList.remove('hidden');
+                document.querySelector('.stats-grid').classList.remove('hidden');
                 iniciarScanner();
-            } else {
+            } else if(tabId === 'bd') {
+                document.getElementById('tabBD').classList.add('active');
+                document.getElementById('secBD').classList.remove('hidden');
+                document.querySelector('.stats-grid').classList.add('hidden');
                 detenerScanner();
-                if (tab === 'bd') {
-                    document.getElementById('secBD').classList.remove('hidden');
-                    document.getElementById('tabBD').classList.add('active');
-                    renderizarBD();
-                } else {
-                    document.getElementById('secHistorial').classList.remove('hidden');
-                    document.getElementById('tabHistorial').classList.add('active');
-                    renderizarHistorial();
-                }
+                actualizarTablaBD();
+            } else if(tabId === 'historial') {
+                document.getElementById('tabHistorial').classList.add('active');
+                document.getElementById('secHistorial').classList.remove('hidden');
+                document.querySelector('.stats-grid').classList.add('hidden');
+                detenerScanner();
+                actualizarTablaHistorial();
             }
         }
 
         function setDireccion(dir) {
             direccionActual = dir;
-            document.getElementById('btnIngreso').className = dir === 'INGRESO' ? 'dir-btn active-in' : 'dir-btn';
-            document.getElementById('btnSalida').className = dir === 'SALIDA' ? 'dir-btn active-out' : 'dir-btn';
-            mostrarAlerta('scannerAlert', `MODO: ${dir} - APUNTE AL QR`, 'info');
+            document.getElementById('btnIngreso').classList.remove('active-in');
+            document.getElementById('btnSalida').classList.remove('active-out');
+            
+            if (dir === 'INGRESO') {
+                document.getElementById('btnIngreso').classList.add('active-in');
+            } else {
+                document.getElementById('btnSalida').classList.add('active-out');
+            }
         }
 
-        // --- ESCÁNER CON CÁMARA (html5-qrcode) ---
+        // --- LECTOR QR (MODIFICADO PARA PC) ---
         function iniciarScanner() {
-            if (html5QrCode == null) {
-                html5QrCode = new Html5Qrcode("reader");
-            }
-            if (!html5QrCode.isScanning) {
-                html5QrCode.start(
-                    { facingMode: "environment" },
-                    { fps: 10, qrbox: { width: 250, height: 250 } },
-                    (decodedText) => {
-                        if (!isProcessing) procesarEscaneo(decodedText);
-                    },
-                    (error) => { /* Ignorar errores de frame vacío */ }
-                ).catch(err => {
-                    mostrarAlerta('scannerAlert', 'ERROR AL ACCEDER A LA CÁMARA', 'error');
-                });
-            }
+            if (html5QrCode) return;
+            
+            html5QrCode = new Html5Qrcode("reader");
+            
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            
+            // AQUÍ ESTÁ EL CAMBIO SOLICITADO: facingMode: "user"
+            html5QrCode.start(
+                { facingMode: "user" },
+                config,
+                (decodedText) => {
+                    if(!isProcessing) {
+                        procesarEscaneo(decodedText);
+                    }
+                },
+                (errorMessage) => {
+                    // Errores sutiles continuos de lectura se ignoran
+                }
+            ).catch(err => {
+                mostrarAlerta('scannerAlert', `Error al acceder a la cámara. Revisa los permisos o usa la búsqueda manual.`, 'error');
+            });
         }
 
         function detenerScanner() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                html5QrCode.stop().catch(err => console.error(err));
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                    html5QrCode = null;
+                }).catch(err => console.error("Error al detener", err));
             }
+        }
+
+        // --- LÓGICA DE TRANSACCIÓN ---
+        function procesarEscaneo(doc) {
+            isProcessing = true;
+            verificarRegistro(doc);
         }
 
         function procesarTransaccionManual() {
-            const serial = document.getElementById('manualSerial').value.trim().toUpperCase();
-            if(serial) procesarEscaneo(serial);
-            document.getElementById('manualSerial').value = "";
+            const val = document.getElementById('manualSearch').value.trim();
+            if(!val) return;
+            
+            let docEncontrado = val;
+            if(!bdEquipos[val]) {
+                // Si no es el documento, probar buscando por serial
+                for(let key in bdEquipos) {
+                    if(bdEquipos[key].serial === val) {
+                        docEncontrado = key;
+                        break;
+                    }
+                }
+            }
+            document.getElementById('manualSearch').value = '';
+            verificarRegistro(docEncontrado);
         }
 
-        function procesarEscaneo(serial) {
-            isProcessing = true;
+        function verificarRegistro(doc) {
+            const registro = bdEquipos[doc];
             
-            if (!bdEquipos[serial]) {
-                mostrarAlerta('scannerAlert', `ERROR: QR INVÁLIDO O NO REGISTRADO`, 'error');
-                setTimeout(() => { isProcessing = false; setDireccion(direccionActual); }, 3000);
+            if (!registro) {
+                mostrarAlerta('scannerAlert', `No se encontró registro en base de datos.`, 'error');
+                setTimeout(() => {
+                    mostrarAlerta('scannerAlert', 'CÁMARA LISTA - APUNTE AL QR', 'info', 'camera');
+                    isProcessing = false;
+                }, 3000);
                 return;
             }
 
-            const eq = bdEquipos[serial];
+            // Preparar y Mostrar Modal de Verificación
+            registroEnEspera = registro;
             
-            if (direccionActual === 'INGRESO' && eq.estado === 'EN PLANTA') {
-                mostrarAlerta('scannerAlert', `⚠️ YA ESTÁ EN PLANTA: ${eq.propietario}`, 'warning');
-            } else if (direccionActual === 'SALIDA' && eq.estado === 'FUERA DE INSTALACIONES') {
-                mostrarAlerta('scannerAlert', `⚠️ NO HAY REGISTRO DE ENTRADA: ${eq.propietario}`, 'warning');
-            } else {
-                eq.estado = direccionActual === 'INGRESO' ? 'EN PLANTA' : 'FUERA DE INSTALACIONES';
-                historialRegistros.push({ hora: obtenerFechaHora(), serial: serial, mov: direccionActual, prop: eq.propietario });
-                mostrarAlerta('scannerAlert', `✅ ${direccionActual} AUTORIZADA: ${eq.propietario}`, 'success');
-                
-                // Efecto de sonido corto (opcional mediante Web Audio API, simulado aquí visualmente)
-                if (navigator.vibrate) navigator.vibrate(200);
-            }
+            document.getElementById('vFotoPersona').src = registro.fotoRostroUrl || 'https://via.placeholder.com/80';
+            document.getElementById('vNombre').textContent = registro.nombre;
+            document.getElementById('vDoc').textContent = `${registro.tipoDoc} ${registro.documento}`;
+            document.getElementById('vFicha').textContent = registro.ficha;
+            
+            document.getElementById('vFotoEquipo').src = registro.fotoEquipoUrl || 'https://via.placeholder.com/80';
+            document.getElementById('vMarca').textContent = registro.marca;
+            document.getElementById('vSerial').textContent = registro.serial;
+            document.getElementById('vEstadoFisico').textContent = registro.estadoFisico;
+            
+            document.getElementById('vSentidoTexto').textContent = direccionActual;
 
-            // Pausa antes de leer otro código
-            setTimeout(() => { 
-                isProcessing = false; 
-                setDireccion(direccionActual);
+            document.getElementById('modalVerify').classList.remove('hidden');
+        }
+
+        function cancelarVerificacion() {
+            document.getElementById('modalVerify').classList.add('hidden');
+            registroEnEspera = null;
+            setTimeout(() => { isProcessing = false; }, 1000); 
+        }
+
+        function confirmarTransaccion() {
+            if (!registroEnEspera) return;
+            
+            // Actualizar estado (Si entra es EN PLANTA, si sale es FUERA)
+            const nuevoEstado = direccionActual === 'INGRESO' ? 'EN PLANTA' : 'FUERA';
+            registroEnEspera.estado = nuevoEstado;
+            
+            // Registrar en el historial
+            historialRegistros.unshift({
+                fecha: obtenerFechaHora(),
+                movimiento: direccionActual,
+                aprendiz: registroEnEspera.nombre,
+                equipo: `${registroEnEspera.marca} (S/N: ${registroEnEspera.serial})`
+            });
+
+            document.getElementById('modalVerify').classList.add('hidden');
+            mostrarAlerta('scannerAlert', `¡${direccionActual} AUTORIZADA EXITOSAMENTE!`, 'success', 'check-circle');
+            
+            actualizarEstadisticas();
+            registroEnEspera = null;
+            
+            setTimeout(() => {
+                mostrarAlerta('scannerAlert', 'CÁMARA LISTA - APUNTE AL QR', 'info', 'camera');
+                isProcessing = false;
             }, 3000);
         }
 
-        function renderizarBD() {
-            const tb = document.querySelector('#tablaBD tbody');
-            tb.innerHTML = "";
-            for (const [serial, data] of Object.entries(bdEquipos)) {
-                let cl = data.estado === 'EN PLANTA' ? 'var(--sena-green)' : '#64748b';
-                tb.innerHTML += `
-                    <tr>
-                        <td style="font-weight:bold; font-size:12px;">${serial}</td>
-                        <td style="font-size:12px;"><strong>${data.propietario}</strong><br>${data.categoria}</td>
-                        <td style="color:${cl}; font-weight:bold; font-size:11px;">${data.estado}</td>
-                    </tr>`;
+        // --- RENDERIZADO DE TABLAS ---
+        function actualizarTablaBD() {
+            const tbody = document.querySelector('#tablaBD tbody');
+            tbody.innerHTML = '';
+            
+            for (const doc in bdEquipos) {
+                const reg = bdEquipos[doc];
+                const badgeClass = reg.estado === 'EN PLANTA' ? 'status-in' : 'status-out';
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <strong>${reg.nombre}</strong><br>
+                        <small class="text-muted">${reg.documento}</small>
+                    </td>
+                    <td>
+                        <strong>${reg.marca}</strong><br>
+                        <small class="text-muted">S/N: ${reg.serial}</small>
+                    </td>
+                    <td>${reg.estadoFisico}</td>
+                    <td><span class="status-badge ${badgeClass}">${reg.estado}</span></td>
+                `;
+                tbody.appendChild(tr);
             }
         }
 
-        function renderizarHistorial() {
-            const tb = document.querySelector('#tablaHistorial tbody');
-            tb.innerHTML = "";
-            [...historialRegistros].reverse().forEach(r => {
-                let cl = r.mov === 'INGRESO' ? 'var(--sena-green)' : 'var(--alert-orange)';
-                tb.innerHTML += `
-                    <tr>
-                        <td style="font-family:Jura; font-size:12px;">${r.hora}</td>
-                        <td style="font-size:12px;"><span style="color:${cl}; font-weight:bold;">${r.mov}</span><br>${r.prop} (${r.serial})</td>
-                    </tr>`;
+        function actualizarTablaHistorial() {
+            const tbody = document.querySelector('#tablaHistorial tbody');
+            tbody.innerHTML = '';
+            
+            historialRegistros.forEach(reg => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${reg.fecha}</td>
+                    <td><strong>${reg.movimiento}</strong></td>
+                    <td>${reg.aprendiz}</td>
+                    <td>${reg.equipo}</td>
+                `;
+                tbody.appendChild(tr);
             });
         }
+
+        function purgarCaducados() {
+            mostrarAlerta('bdAlert', 'Base de datos optimizada (simulación)', 'success');
+            setTimeout(() => ocultarAlerta('bdAlert'), 3000);
+        }
+
     </script>
 </body>
 </html>
